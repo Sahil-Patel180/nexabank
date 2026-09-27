@@ -13,6 +13,8 @@ export function Cursor() {
     const el = root.current!, dot = el.querySelector(".cursor__dot")!, ring = el.querySelector(".cursor__ring")!, lab = label.current!;
     document.documentElement.classList.add("has-cursor");
     gsap.set([dot, ring, lab], { x: -100, y: -100 });
+    // centre the label on the pointer inside GSAP's own transform (a CSS translate would be overwritten)
+    gsap.set(lab, { xPercent: -50, yPercent: -50 });
     const dx = gsap.quickTo(dot, "x", { duration: 0.08, ease: "power3" }), dy = gsap.quickTo(dot, "y", { duration: 0.08, ease: "power3" });
     const rx = gsap.quickTo(ring, "x", { duration: 0.45, ease: "power3" }), ry = gsap.quickTo(ring, "y", { duration: 0.45, ease: "power3" });
     const lx = gsap.quickTo(lab, "x", { duration: 0.45, ease: "power3" }), ly = gsap.quickTo(lab, "y", { duration: 0.45, ease: "power3" });

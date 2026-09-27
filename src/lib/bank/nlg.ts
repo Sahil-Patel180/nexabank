@@ -97,7 +97,7 @@ const T: Record<string, Fn[]> = {
   confirm_block: [(d) => `This will immediately block your ${d.card}. It can't be used until you request a replacement. Proceed?`],
   card_blocked: [(d) => `Your ${d.card} is now blocked. A replacement will reach your registered address in 5–7 working days. Ticket ${d.ticket}.`],
   already_blocked: [(d) => `Your ${d.card} is already blocked. Want me to raise a replacement request?`],
-  cards: [(d) => `You have ${plural(d.count, "card")}. Credit card due: ${d.due} ${d.dueWhen}.`],
+  cards: [(d) => `You have ${plural(d.count, "card")}. Your credit card bill of ${d.due} is due ${/^(in |today|tomorrow)/.test(d.dueWhen) ? d.dueWhen : "on " + d.dueWhen}.`],
   emi: [(d) => `For ${d.principal} at ${d.rate}% over ${d.tenure}, your EMI would be ${d.emi}/month. Total interest: ${d.interest}.`, (d) => `EMI comes to ${d.emi} a month (${d.principal}, ${d.rate}% p.a., ${d.tenure}).`],
   ask_emi_amount: [() => `What loan amount should I calculate the EMI for?`],
   ask_emi_tenure: [(d) => `And for how long? (e.g. 5 years) — I'll use ${d.rate}% p.a. for a ${d.loan}.`],

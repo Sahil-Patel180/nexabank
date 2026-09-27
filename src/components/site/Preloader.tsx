@@ -38,7 +38,19 @@ export function Preloader() {
     const counter = { v: 0 };
     const numEl = q(".js-count")[0] as HTMLElement;
     const barEl = q(".js-bar")[0] as HTMLElement;
-    const render = () => { numEl.textContent = String(Math.round(counter.v)).padStart(3, "0"); gsap.set(barEl, { scaleX: counter.v / 100 }); };
+    const ringEl = q(".js-ring")[0]; // SVG circle; GSAP only needs an Element
+    const CIRC = 2 * Math.PI * 46;
+    const render = () => {
+      numEl.textContent = String(Math.round(counter.v)).padStart(3, "0");
+      gsap.set(barEl, { scaleX: counter.v / 100 });
+      gsap.set(ringEl, { strokeDashoffset: CIRC * (1 - counter.v / 100) });
+    };
+
+    // logo intro: ovals bloom outward-in, core breathes, orbit turns
+    gsap.fromTo(q(".js-eye"), { scale: 0, opacity: 0 }, { scale: 1, opacity: 1, duration: 1.1, ease: EASE.spring, stagger: 0.14 });
+    gsap.fromTo(q(".js-logo-word"), { yPercent: 110 }, { yPercent: 0, duration: 1, ease: EASE.out, delay: 0.45 });
+    const breathe = gsap.to(q(".js-core"), { scale: 1.18, duration: 0.9, ease: "sine.inOut", yoyo: true, repeat: -1, delay: 1 });
+    const orbit = gsap.to(q(".js-orbit"), { rotation: 360, duration: 9, ease: "none", repeat: -1 });
 
     // real readiness signals
     let target = 12;
@@ -60,8 +72,9 @@ export function Preloader() {
       if (opened || counter.v < 100) return;
       opened = true;
       cycle.kill();
-      gsap.timeline({ onComplete: finish, delay: 0.15 })
-        .to(q(".preloader__content"), { autoAlpha: 0, y: -20, duration: 0.5, ease: "power2.in" })
+      gsap.timeline({ onComplete: () => { breathe.kill(); orbit.kill(); finish(); }, delay: 0.15 })
+        .to(q(".js-logo"), { scale: 1.25, autoAlpha: 0, duration: 0.7, ease: "power3.in" })
+        .to(q(".preloader__content"), { autoAlpha: 0, y: -20, duration: 0.5, ease: "power2.in" }, "<0.1")
         .to(q(".preloader__panel--top"), { yPercent: -100, duration: 1.1, ease: EASE.inOut }, "-=0.1")
         .to(q(".preloader__panel--bottom"), { yPercent: 100, duration: 1.1, ease: EASE.inOut }, "<")
         .add(() => window.dispatchEvent(new Event(PRELOAD_DONE + ":opening")), "<0.35");
@@ -74,12 +87,32 @@ export function Preloader() {
       <div className="preloader__panel preloader__panel--bottom" />
       <div className="preloader__content">
         <div className="flex items-center justify-between text-sm text-mist">
-          <span className="font-serif text-2xl text-ivory">NexaBank</span>
           <span>Nova · conversational banking</span>
+          <span>Loading your bank</span>
+        </div>
+        {/* centred animated mark: three blooming ovals, breathing core, orbit + real progress ring */}
+        <div className="js-logo pointer-events-none absolute left-1/2 top-1/2 flex -translate-x-1/2 -translate-y-1/2 flex-col items-center">
+          <svg viewBox="0 0 100 100" className="h-[clamp(8rem,20vw,13rem)] w-[clamp(8rem,20vw,13rem)] overflow-visible" aria-hidden>
+            <g className="js-orbit [transform-box:view-box] origin-center">
+              <circle cx="50" cy="50" r="49" fill="none" stroke="#1a3a44" strokeWidth="0.6" strokeDasharray="1 4" />
+              <circle cx="50" cy="1" r="1.6" fill="#2bc0b4" />
+            </g>
+            <circle cx="50" cy="50" r="46" fill="none" stroke="#1a3a44" strokeWidth="1.2" />
+            <circle className="js-ring" cx="50" cy="50" r="46" fill="none" stroke="#f2a93b" strokeWidth="1.2" strokeLinecap="round"
+              strokeDasharray={2 * Math.PI * 46} strokeDashoffset={2 * Math.PI * 46} transform="rotate(-90 50 50)" />
+            <ellipse className="js-eye [transform-box:fill-box] origin-center" cx="50" cy="52" rx="27" ry="32" fill="#0f5d6c" />
+            <ellipse className="js-eye [transform-box:fill-box] origin-center" cx="50" cy="54.5" rx="17" ry="20.5" fill="#061a20" />
+            <ellipse className="js-eye js-core [transform-box:fill-box] origin-center" cx="50" cy="57" rx="8.2" ry="10" fill="#f2a93b" />
+          </svg>
+          <div className="mt-6 overflow-hidden"><span className="js-logo-word block font-serif text-3xl text-ivory sm:text-4xl">NexaBank</span></div>
         </div>
         <div className="flex items-end justify-between gap-6">
-          <div className="h-[1.1em] overflow-hidden font-serif text-[clamp(2.5rem,7vw,6rem)] leading-none">
-            <div className="relative h-[1.1em] w-[6ch]">{WORDS.map((w) => <span key={w} className="js-word absolute left-0 top-0 translate-y-[110%]">{w}</span>)}</div>
+          <div className="overflow-hidden pb-[0.12em] font-serif text-[clamp(2.5rem,7vw,6rem)] leading-none">
+            {/* invisible sizer = longest word, so no word is ever clipped */}
+            <div className="relative whitespace-nowrap">
+              <span className="invisible">{WORDS.reduce((a, b) => (b.length > a.length ? b : a))}</span>
+              {WORDS.map((w) => <span key={w} className="js-word absolute left-0 top-0 translate-y-[110%]">{w}</span>)}
+            </div>
           </div>
           <span className="js-count num font-mono text-[clamp(2.5rem,7vw,6rem)] leading-none text-marigold-500">000</span>
         </div>
