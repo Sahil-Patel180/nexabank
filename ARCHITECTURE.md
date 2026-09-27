@@ -41,7 +41,7 @@ flowchart LR
 
 | Layer | Location | Responsibility |
 |---|---|---|
-| Presentation | `src/app`, `src/components` | Landing, login, dashboard, chat UI, rich cards, inspector, animations (Framer Motion) |
+| Presentation | `src/app`, `src/components` | Landing (GSAP + Lenis motion system), login, dashboard, chat UI, rich cards, inspector (Framer Motion micro-states) |
 | API | `src/app/api/*` | Auth (login/logout), chat turn, customer summary |
 | Security | `src/middleware.ts`, `src/lib/auth.ts` | Signed JWT in httpOnly cookie, route protection, brute-force lock-out |
 | NLU | `nlu/` | Normalisation → features → softmax classifier; rule + gazetteer entity extraction |

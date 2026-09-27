@@ -65,7 +65,7 @@ export function Dashboard({ initial }: { initial: Summary }) {
           <motion.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} className="relative overflow-hidden rounded-3xl bg-peacock-900 p-5 text-white">
             <div className="dot-field absolute inset-0 opacity-25" />
             <div className="relative">
-              <p className="text-sm text-white/60">Good {hour < 12 ? "morning" : hour < 17 ? "afternoon" : "evening"}, {sum.firstName}</p>
+              <p className="font-serif text-2xl leading-tight text-white">Good {hour < 12 ? "morning" : hour < 17 ? "afternoon" : "evening"}, {sum.firstName}</p>
               <p className="mt-4 text-xs text-white/50">Total balance</p>
               <p className="font-display text-4xl font-bold tracking-tight"><Balance value={total} /></p>
               <div className="mt-4 grid grid-cols-2 gap-3 text-sm">

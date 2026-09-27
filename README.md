@@ -15,7 +15,7 @@ Customers talk to *Nova* in plain English (“send 2k to Rohan”, “how much d
 | **NLU** | From-scratch TF-IDF + softmax intent classifier (25 intents, word + character n-grams, int8-quantised) and a regex/gazetteer/fuzzy entity extractor (amounts in lakh/crore, payees & aliases, dates, merchants, cities, tenures). **94.3 % accuracy** on a hand-written hold-out set. |
 | **Dialogue** | Frame-based slot filling, multi-turn context carry-over, digressions, confirmations, OTP step-up, business-rule checks, explainable per-turn trace. |
 | **NLG** | Dialogue-act templates with variation, Indian number formatting (₹3,65,528 · ₹28.7 lakh), personalisation, confidence hedging, 16 kinds of rich cards, optional text-to-speech. |
-| **Web app** | Next.js 15 + React 19 + Tailwind v4 + Framer Motion: animated landing page with a live parse demo and scroll-driven architecture story, login with 3D tilt card, dashboard with chat, voice input and an *Under the hood* NLU inspector. |
+| **Web app** | Next.js 15 + React 19 + Tailwind v4 + **GSAP + Lenis** (landing) + Framer Motion (app micro-states): count-up curtain preloader, masked word reveals, scroll-scrubbed manifesto, pinned horizontal pipeline, magnetic buttons, follower cursor, route curtains; dark-premium login; dashboard with chat, voice input and an *Under the hood* NLU inspector. |
 | **Security** | scrypt password hashes, signed JWT in httpOnly cookie, middleware route guard, login lock-out, server-side dialogue state. |
 
 See **[ARCHITECTURE.md](ARCHITECTURE.md)** for diagrams and design decisions.
@@ -99,6 +99,21 @@ scripts/simulate.ts
 
 ---
 
+## Motion & design system
+
+| Piece | File | Notes |
+|---|---|---|
+| Tokens | `src/app/globals.css` | void/abyss/surface backgrounds, ivory + mist type, marigold accent, peacock glow; Instrument Serif display, Geist body, Geist Mono data |
+| Curves | `globals.css`, `src/lib/motion.ts` | `--ease-out-expo` (entrances), `--ease-in-out-quart` (curtains), `--ease-spring` (success), `--ease-press` (active); mirrored as GSAP eases |
+| Preloader | `components/site/Preloader.tsx` | server-rendered cover, count-up tied to `document.fonts.ready` + `window.load`, split-curtain open; page is fully laid out underneath → zero CLS |
+| Smooth scroll | `components/site/SmoothScroll.tsx` | Lenis on GSAP's ticker, feeds ScrollTrigger |
+| Reveals | `components/site/Reveal.tsx` | `SplitText` (masked words), `ScrubText` (scroll-brightened words), `Reveal` (fade + `data-speed` parallax) |
+| Interaction | `Cursor.tsx`, `Magnetic.tsx` | follower cursor (fine pointers only, `data-cursor="Label"`), magnetic pull with elastic return |
+| Pinned story | `components/landing/Pipeline.tsx` | desktop pin + horizontal scrub via `gsap.matchMedia`; stacked on mobile |
+| Route change | `src/app/template.tsx` | curtain lifts on every page except the landing page |
+
+Everything animates `transform`/`opacity` only. `prefers-reduced-motion` is detected before first paint (inline script): Lenis, cursor, marquee, curtains and reveals switch off and all content renders in its final state.
+
 ## Showreel deck
 
 `deck/Nova_Showreel.pptx` — 16-slide motion-graphic presentation. Open in **PowerPoint 2019 / Microsoft 365** and press F5: slides auto-advance with **Morph** transitions (the peacock-eye motif glides between slides, the entity highlights grow on slides 4→5) and staggered entrance animations; it loops like a reel. Click to advance faster; Esc to stop. Older PowerPoint and Google Slides fall back to fades.
@@ -107,7 +122,7 @@ Rebuild after changing the model or copy: `NODE_PATH=$(npm root -g) node deck/bu
 
 ## Tech stack
 
-Next.js 15 (App Router) · React 19 · TypeScript · Tailwind CSS v4 · Framer Motion · jose (JWT) · lucide-react · Node crypto (scrypt) · Web Speech API. The NLU/NLG has **zero runtime dependencies**.
+Next.js 15 (App Router) · React 19 · TypeScript · Tailwind CSS v4 · GSAP 3 + ScrollTrigger · Lenis · Framer Motion · jose (JWT) · lucide-react · Node crypto (scrypt) · Web Speech API. The NLU/NLG has **zero runtime dependencies**.
 
 ## Limitations
 
