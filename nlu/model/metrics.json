@@ -1,0 +1,163 @@
+{
+  "testSize": 88,
+  "accuracy": 0.9431818181818182,
+  "macroF1": 0.9472380952380952,
+  "perIntent": {
+    "greet": {
+      "precision": 1,
+      "recall": 1,
+      "f1": 1
+    },
+    "goodbye": {
+      "precision": 1,
+      "recall": 1,
+      "f1": 1
+    },
+    "thanks": {
+      "precision": 1,
+      "recall": 1,
+      "f1": 1
+    },
+    "affirm": {
+      "precision": 0.75,
+      "recall": 1,
+      "f1": 0.857
+    },
+    "deny": {
+      "precision": 1,
+      "recall": 1,
+      "f1": 1
+    },
+    "cancel": {
+      "precision": 1,
+      "recall": 1,
+      "f1": 1
+    },
+    "bot_capabilities": {
+      "precision": 0.75,
+      "recall": 1,
+      "f1": 0.857
+    },
+    "check_balance": {
+      "precision": 1,
+      "recall": 0.8,
+      "f1": 0.889
+    },
+    "mini_statement": {
+      "precision": 1,
+      "recall": 0.8,
+      "f1": 0.889
+    },
+    "out_of_scope": {
+      "precision": 0.833,
+      "recall": 0.833,
+      "f1": 0.833
+    },
+    "spending_analysis": {
+      "precision": 1,
+      "recall": 1,
+      "f1": 1
+    },
+    "transfer_money": {
+      "precision": 1,
+      "recall": 1,
+      "f1": 1
+    },
+    "pay_bill": {
+      "precision": 1,
+      "recall": 1,
+      "f1": 1
+    },
+    "block_card": {
+      "precision": 0.8,
+      "recall": 1,
+      "f1": 0.889
+    },
+    "card_info": {
+      "precision": 0.667,
+      "recall": 0.667,
+      "f1": 0.667
+    },
+    "loan_emi_calc": {
+      "precision": 1,
+      "recall": 1,
+      "f1": 1
+    },
+    "loan_eligibility": {
+      "precision": 1,
+      "recall": 1,
+      "f1": 1
+    },
+    "loan_status": {
+      "precision": 1,
+      "recall": 0.667,
+      "f1": 0.8
+    },
+    "interest_rates": {
+      "precision": 1,
+      "recall": 1,
+      "f1": 1
+    },
+    "kyc_documents": {
+      "precision": 1,
+      "recall": 1,
+      "f1": 1
+    },
+    "open_account": {
+      "precision": 1,
+      "recall": 1,
+      "f1": 1
+    },
+    "find_branch": {
+      "precision": 1,
+      "recall": 1,
+      "f1": 1
+    },
+    "find_atm": {
+      "precision": 1,
+      "recall": 1,
+      "f1": 1
+    },
+    "human_agent": {
+      "precision": 1,
+      "recall": 1,
+      "f1": 1
+    },
+    "report_fraud": {
+      "precision": 1,
+      "recall": 1,
+      "f1": 1
+    }
+  },
+  "confusions": [
+    {
+      "text": "how much cash is in my account right now",
+      "gold": "check_balance",
+      "pred": "affirm"
+    },
+    {
+      "text": "give me a mini statment",
+      "gold": "mini_statement",
+      "pred": "out_of_scope"
+    },
+    {
+      "text": "when do i have to pay my credit card",
+      "gold": "card_info",
+      "pred": "block_card"
+    },
+    {
+      "text": "when is my emi due",
+      "gold": "loan_status",
+      "pred": "card_info"
+    },
+    {
+      "text": "who is virat kohli",
+      "gold": "out_of_scope",
+      "pred": "bot_capabilities"
+    }
+  ],
+  "trainSize": 2874,
+  "features": 5932,
+  "trainedAt": "2026-09-27T11:01:36.252Z",
+  "trainMs": 6212
+}
