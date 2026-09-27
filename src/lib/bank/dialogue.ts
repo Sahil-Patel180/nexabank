@@ -78,7 +78,8 @@ export function handleMessage(user: User, sessionId: string, text: string): Chat
   if (S.frame?.awaiting === "otp") {
     const code = text.replace(/\D/g, "");
     if (/^\d{6}$/.test(code)) {
-      trace.push("Policy → OTP verification");
+      trace.length = 1; // never echo the OTP back as an "amount" entity
+      trace.push("Policy → OTP received (••••••) → verification");
       const f = S.frame;
       if (code === f.otp) { finishTransfer(); }
       else {
@@ -109,6 +110,12 @@ export function handleMessage(user: User, sessionId: string, text: string): Chat
         reply((intent === "out_of_scope" && !parsed.fallback ? "That's outside what I can help with. " : "Sorry, I didn't catch that. ") + (reask[f.awaiting] ?? "Could you rephrase?"));
         suggestions = ["Cancel"]; return done();
       }
+    } else if (["thanks", "greet", "bot_capabilities"].includes(intent) && f.awaiting) {
+      trace.push(`Small talk inside '${f.intent}' → keep frame, re-ask`);
+      const reask: Record<string, string> = { amount: "What amount should I use?", card: "Which card should I block — debit or credit?", bill: "Which bill should I pay?", tenure: "For how many years?", payee: "Who should I send it to?", confirm: "Shall I go ahead?", otp: "Please enter the 6-digit OTP." };
+      reply((intent === "thanks" ? "You're welcome! " : intent === "greet" ? "Hi again! " : "I can do quite a lot — first, let's finish this. ") + (reask[f.awaiting] ?? ""));
+      suggestions = f.awaiting === "card" ? ["Debit card", "Credit card", "Cancel"] : f.awaiting === "confirm" ? ["Confirm", "Cancel"] : ["Cancel"];
+      return done();
     } else if (intent !== f.intent) {
       trace.push(`Digression → dropping '${f.intent}' frame`);
       reply(`Okay, I've stopped ${INTENT_LABEL[f.intent] ?? "that"}${f.intent === "transfer_money" || f.intent === "pay_bill" ? " — nothing was sent" : ""}.`);
@@ -218,8 +225,14 @@ export function handleMessage(user: User, sessionId: string, text: string): Chat
       }
 
       case "block_card": {
-        const f: Frame = S.frame?.intent === "block_card" ? S.frame : { intent, slots: {} };
+        const fresh = S.frame?.intent !== "block_card";
+        const f: Frame = fresh ? { intent, slots: {} } : S.frame!;
         S.frame = f; fillSlots(f, ents);
+        if (fresh && /\b(used|debited|spent|charged|transactions?|unauthori[sz]ed|fraud|withdrew|withdrawn)\b/i.test(text)) {
+          f.slots.fraud = true;
+          trace.push("Signal → card possibly misused → will offer fraud dispute");
+          reply("Let's secure your card first. Since it may already have been used, I'll help you raise a fraud dispute right after.");
+        }
         if (!f.slots.card) { f.awaiting = "card"; reply(say("ask_card")); suggestions = ["Debit card", "Credit card"]; break; }
         const c = user.cards.find((x) => x.type === f.slots.card)!;
         const label = `${c.network} ${c.type} card •••• ${c.last4}`;
@@ -252,7 +265,8 @@ export function handleMessage(user: User, sessionId: string, text: string): Chat
         S.last = { intent: "loan_emi_calc", ents: { amount: P, tenure_months: n, loan_type: lt } };
         reply(say("emi", { principal: inrWords(P), rate, tenure: n % 12 ? plural(n, "month") : plural(n / 12, "year"), emi: inr(Math.round(emi)), interest: inrWords(Math.round(emi * n - P)) }),
           { kind: "emi", principal: P, rate, months: n, emi: Math.round(emi), interest: Math.round(emi * n - P), total: Math.round(emi * n), loanType: lt });
-        suggestions = ["What about 15 years?", "Am I eligible?", "Home loan rates"];
+        const alt = [20, 15, 10, 25].find((y) => y * 12 !== n) ?? 10;
+        suggestions = [`What about ${alt} years?`, "Am I eligible?", "Home loan rates"];
         return;
       }
 
@@ -315,8 +329,8 @@ export function handleMessage(user: User, sessionId: string, text: string): Chat
         if (!city) { S.last = { intent, ents: {} }; reply(say("ask_city", { kind })); suggestions = ["Mumbai", "Bengaluru", "Chennai", "Delhi"]; return; }
         const list = BRANCHES.filter((b) => b.city === city && (kind === "branch" || b.atm));
         if (!list.length) { reply(say("no_branch", { kind, city, cities: joinList([...new Set(BRANCHES.map((b) => b.city))]) })); break; }
-        const note = ents.location === "near_me" && !ents.city ? " (using your home branch city — tell me another city anytime)" : "";
-        reply(say("branches", { count: list.length, kind, city }) + note, { kind: "branches", type: kind === "ATM" ? "atm" : "branch", items: list.map(({ name, city, address, ifsc, hours, atm }) => ({ name, city, address, ifsc, hours, atm })) });
+        const note = ents.location === "near_me" && !ents.city ? `I don't have your live location, so I'm using your home branch city, ${city}. ` : "";
+        reply(note + say("branches", { count: list.length, kind, city }), { kind: "branches", type: kind === "ATM" ? "atm" : "branch", items: list.map(({ name, city, address, ifsc, hours, atm }) => ({ name, city, address, ifsc, hours, atm })) });
         suggestions = [kind === "ATM" ? "Branches here" : "ATMs here", "Branch in Chennai"];
         break;
       }
@@ -389,7 +403,9 @@ export function handleMessage(user: User, sessionId: string, text: string): Chat
       c.status = "blocked";
       const t = ticket("CB");
       reply(say("card_blocked", { card: `${c.type} card •••• ${c.last4}`, ticket: t }), { kind: "alert", tone: "success", title: "Card blocked", body: `${c.network} ${c.type} •••• ${c.last4} · Ticket ${t}` });
-      S.frame = undefined; suggestions = ["Show my cards", "Report fraud"];
+      const fraud = f.slots.fraud;
+      if (fraud) reply("Next, tell me about the transaction you didn't make and I'll raise a priority dispute.");
+      S.frame = undefined; suggestions = fraud ? ["Report fraud", "Show recent transactions", "Show my cards"] : ["Show my cards", "Report fraud"];
     }
     return done();
   }

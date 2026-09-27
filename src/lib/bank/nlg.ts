@@ -21,6 +21,7 @@ export function joinList(items: string[], conj = "and") {
   if (items.length <= 1) return items.join("");
   return items.slice(0, -1).join(", ") + ` ${conj} ` + items.at(-1);
 }
+export const cap = (s: string) => s.charAt(0).toUpperCase() + s.slice(1);
 export const plural = (n: number, one: string, many = one + "s") => `${n} ${n === 1 ? one : many}`;
 export function relDay(iso: string) {
   const d = new Date(iso); const now = new Date();
@@ -74,7 +75,7 @@ const T: Record<string, Fn[]> = {
     (d) => `${d.period.charAt(0).toUpperCase() + d.period.slice(1)}, ${d.what} cost you ${d.total}${d.count ? ` (${plural(d.count, "payment")})` : ""}.${d.top ? ` Most of it went to ${d.top}.` : ""}`,
   ],
   spending_overview: [
-    (d) => `You spent ${d.total} ${d.period}. ${d.lead} was your top category at ${d.leadAmt} (${d.leadPct}%).`,
+    (d) => `You spent ${d.total} ${d.period}. ${cap(d.lead)} was your top category at ${d.leadAmt} (${d.leadPct}%).`,
     (d) => `${d.period.charAt(0).toUpperCase() + d.period.slice(1)} your outflow was ${d.total} — led by ${d.lead} (${d.leadPct}%).`,
   ],
   ask_payee: [() => `Who would you like to send money to? Pick a saved beneficiary or type a name.`, () => `Sure — to whom?`],

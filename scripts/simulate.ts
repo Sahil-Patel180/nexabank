@@ -7,7 +7,7 @@ const convo = [
   "send money to rohan", "3000", "yes", "transfer 40k to mom", "confirm", "OTP", "pay electricity bill", "yes",
   "emi for 20 lakh home loan", "15 years", "what about 20 years?", "am i eligible for a personal loan", "block my card", "credit", "no",
   "send 500 to Karan", "neha", "800", "actually what are fd rates", "atm near me", "branch in bangalore", "i lost my wallet and someone used my card",
-  "who won the ipl", "thanks", "bye",
+  "who won the ipl", "thanks", "debit card", "yes", "bye",
 ];
 let otp = "";
 for (let msg of convo) {
