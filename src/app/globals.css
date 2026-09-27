@@ -1,0 +1,54 @@
+@import "tailwindcss";
+
+/* ── NexaBank design tokens ─────────────────────────────────
+   Peacock (brand) · Marigold (money / emphasis) · Paper (cool)
+   ─────────────────────────────────────────────────────────── */
+@theme {
+  --color-peacock-950: #06222b;
+  --color-peacock-900: #0a3140;
+  --color-peacock-800: #0c4555;
+  --color-peacock-700: #0f5d6c;
+  --color-peacock-600: #11767f;
+  --color-peacock-500: #16939a;
+  --color-peacock-300: #7fcfcf;
+  --color-peacock-100: #d7f0ee;
+  --color-marigold-500: #f2a93b;
+  --color-marigold-400: #f6bf61;
+  --color-marigold-100: #fdf0d6;
+  --color-paper: #f4f7f7;
+  --color-ink: #10232a;
+  --color-slate: #56686f;
+  --color-line: #dbe4e5;
+  --color-success: #23915f;
+  --color-danger: #c9403a;
+
+  --font-display: var(--font-bricolage), ui-sans-serif, system-ui;
+  --font-sans: var(--font-instrument), ui-sans-serif, system-ui;
+
+  --ease-out-expo: cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+html { scroll-behavior: smooth; }
+body {
+  background: var(--color-paper);
+  color: var(--color-ink);
+  font-family: var(--font-sans);
+  -webkit-font-smoothing: antialiased;
+  font-feature-settings: "ss01", "cv11";
+}
+.num { font-variant-numeric: tabular-nums; }
+::selection { background: var(--color-marigold-400); color: var(--color-peacock-950); }
+:focus-visible { outline: 2px solid var(--color-marigold-500); outline-offset: 2px; border-radius: 6px; }
+
+/* dotted field used behind the hero demo */
+.dot-field {
+  background-image: radial-gradient(color-mix(in oklab, var(--color-peacock-300) 35%, transparent) 1px, transparent 1px);
+  background-size: 22px 22px;
+}
+/* thin scrollbars in chat */
+.thin-scroll { scrollbar-width: thin; scrollbar-color: var(--color-line) transparent; }
+
+@media (prefers-reduced-motion: reduce) {
+  html { scroll-behavior: auto; }
+  *, *::before, *::after { animation-duration: 0.01ms !important; animation-iteration-count: 1 !important; transition-duration: 0.01ms !important; }
+}
