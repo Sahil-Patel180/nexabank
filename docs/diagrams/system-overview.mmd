@@ -1,0 +1,30 @@
+flowchart LR
+  subgraph Client["Browser · Next.js React client"]
+    L[Landing page] --> LG[Login]
+    LG --> D[Dashboard]
+    D --> CP[Chat panel<br/>voice in / voice out]
+    D --> INS[Under-the-hood<br/>inspector]
+  end
+
+  subgraph Server["Next.js server · Node runtime"]
+    MW[Middleware<br/>JWT session guard]
+    AUTH[/api/auth/*/]
+    CHAT[/api/chat/]
+    ME[/api/me/]
+    subgraph Engine["Conversation engine"]
+      NLU[NLU<br/>intent classifier + entity extractor]
+      DM[Dialogue manager<br/>frames · slots · policies]
+      NLG[NLG<br/>dialogue acts → text + cards]
+    end
+    CBS[(Mock core banking<br/>accounts · txns · cards · loans)]
+  end
+
+  MODEL[(nlu/model/model.json<br/>int8 weights)]
+
+  CP -- "POST message" --> MW --> CHAT --> NLU --> DM
+  DM -- "rules + actions" --> CBS
+  DM --> NLG --> CHAT -- "messages + cards + trace" --> CP
+  CHAT -.-> INS
+  LG --> AUTH --> CBS
+  D --> ME --> CBS
+  MODEL --> NLU

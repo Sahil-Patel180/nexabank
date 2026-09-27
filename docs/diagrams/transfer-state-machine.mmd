@@ -1,0 +1,15 @@
+stateDiagram-v2
+  [*] --> Idle
+  Idle --> AwaitPayee: transfer_money (no payee)
+  Idle --> AwaitAmount: transfer_money (payee, no amount)
+  Idle --> Confirm: transfer_money (payee + amount, rules pass)
+  AwaitPayee --> AwaitAmount: payee filled
+  AwaitAmount --> Confirm: amount filled · balance ✓ · limit ✓
+  Confirm --> Done: affirm (≤ ₹25,000)
+  Confirm --> OTP: affirm (> ₹25,000)
+  OTP --> Done: correct OTP
+  OTP --> Idle: 3 wrong OTPs
+  Confirm --> Idle: deny / cancel
+  AwaitPayee --> Idle: cancel / digression
+  AwaitAmount --> Idle: cancel / digression
+  Done --> Idle

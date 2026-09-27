@@ -1,0 +1,31 @@
+sequenceDiagram
+  autonumber
+  actor U as Customer
+  participant UI as Chat panel
+  participant API as /api/chat
+  participant NLU
+  participant DM as Dialogue manager
+  participant CBS as Core banking
+  participant NLG
+
+  U->>UI: "transfer 40k to mom"
+  UI->>API: POST {message}
+  API->>API: verify session JWT
+  API->>NLU: parse(text, {payees})
+  NLU-->>API: intent=transfer_money (0.99)<br/>amount=40000, payee=Sunita Sharma
+  API->>DM: handleMessage()
+  DM->>CBS: balance? daily limit? known payee?
+  CBS-->>DM: ok
+  DM->>NLG: act=confirm_transfer
+  NLG-->>UI: "Ready to send ₹40,000 to Sunita Sharma…" + confirm card
+  U->>UI: Confirm
+  UI->>API: "Confirm"
+  API->>DM: affirm → amount > ₹25,000
+  DM->>NLG: act=ask_otp
+  NLG-->>UI: OTP card
+  U->>UI: 6-digit OTP
+  UI->>API: OTP
+  DM->>CBS: executeTransfer()
+  CBS-->>DM: reference NXB…, new balance
+  DM->>NLG: act=transfer_done
+  NLG-->>UI: "Done! ₹40,000 sent…" + receipt card

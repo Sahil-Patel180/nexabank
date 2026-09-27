@@ -1,0 +1,10 @@
+flowchart LR
+  T[Raw text] --> N[Normalise<br/>lower-case · contractions · slang<br/>₹/rs → rs · numbers → &lt;num&gt;]
+  N --> F[Features<br/>stemmed unigrams + bigrams<br/>char 3–5-grams]
+  F --> V[TF-IDF<br/>sublinear tf · L2 norm]
+  V --> C[Softmax regression<br/>25 intents]
+  C --> TH{confidence ≥ 0.40?}
+  TH -- yes --> I[intent + ranking]
+  TH -- no --> O[out_of_scope / fallback]
+  T --> E[Entity extractor<br/>regex + gazetteers + Levenshtein]
+  E --> ENT[amount · payee · date_range · category<br/>tenure · city · card/loan/bill type · count]
