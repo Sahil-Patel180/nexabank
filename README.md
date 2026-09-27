@@ -1,4 +1,7 @@
 # NexaBank · Nova
+**Live demo → [nexabank-gvyr.onrender.com](https://nexabank-gvyr.onrender.com)** · demo login `aarav@nexabank.demo` / `Nova@123`
+
+> Free hosting: the first visit after ~15 min idle takes ~30 s to wake up.
 
 **A conversational banking assistant with an in-house NLU, dialogue manager and NLG engine** — built as an ILP mini project in the banking domain.
 
